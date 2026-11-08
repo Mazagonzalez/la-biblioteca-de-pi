@@ -1,4 +1,8 @@
-# π infinito
+# La Biblioteca de π
+
+_Todo está aquí, en algún lugar._ Un homenaje a «La biblioteca de Babel» de
+Borges: si π es un número normal (algo que nadie ha demostrado), sus
+decimales contienen todas las secuencias posibles.
 
 Una página que calcula π sin detenerse, en el navegador, y deja ver su
 aleatoriedad mientras crece. Astro + TypeScript (strict) + Tailwind, sin
@@ -23,6 +27,14 @@ servidor que calcula π sin parar para todos (ver «π global»).
   `src/lib/audio.ts`.
 - **Visor virtualizado** (`src/lib/renderers/text-viewer.ts`): solo pinta las
   filas visibles, con «seguir al último».
+
+## Imagen para compartir
+
+`og.png` (1200×630) se genera al compilar en `src/pages/og.png.ts`: calcula
+los primeros decimales con el mismo spigot, dibuja el Mandala del modo Dibujo
+(`src/lib/og-mandala.ts`), compone el texto con `satori` y lo pasa a PNG con
+`@resvg/resvg-js`. Las URL absolutas (canonical, `og:url`, `og:image`) salen
+de `site` en `astro.config.mjs`.
 
 ## Progreso guardado
 

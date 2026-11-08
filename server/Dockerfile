@@ -1,4 +1,4 @@
-# Servidor de π infinito. Sin dependencias: Node 24 ejecuta TypeScript
+# Servidor de La Biblioteca de π. Sin dependencias: Node 24 ejecuta TypeScript
 # directamente (quitando los tipos), así que no hay paso de compilación.
 FROM node:24-slim
 
