@@ -98,9 +98,10 @@ salta a ese decimal y lo resalta.
 ## Analíticas
 
 Vercel Web Analytics (visitas, sin cookies) y Speed Insights (rendimiento
-real) se cargan desde `src/layouts/Layout.astro`. Hay que activarlos en el
-proyecto de Vercel (pestañas **Analytics** y **Speed Insights**); en local
-solo cargan en modo de depuración y no envían nada.
+real) se cargan desde `src/layouts/Layout.astro`, **solo en producción**:
+cuando Vercel construye con `VERCEL_ENV=production`. En local y en las
+vistas previas de los PR no se incluyen. Hay que activarlos en el proyecto
+de Vercel (pestañas **Analytics** y **Speed Insights**).
 
 ## Buscador
 
