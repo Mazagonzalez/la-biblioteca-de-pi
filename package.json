@@ -1,5 +1,7 @@
 {
     "name": "la-biblioteca-de-pi",
+    "license": "MIT",
+    "author": "Carlos Maza",
     "type": "module",
     "version": "0.0.1",
     "engines": {
