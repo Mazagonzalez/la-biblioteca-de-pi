@@ -2,7 +2,8 @@
 
 Una página que calcula π sin detenerse, en el navegador, y deja ver su
 aleatoriedad mientras crece. Astro + TypeScript (strict) + Tailwind, sin
-frameworks de UI. Todo corre en el cliente; se despliega como sitio estático.
+frameworks de UI. La web es un sitio estático; opcionalmente se conecta a un
+servidor que calcula π sin parar para todos (ver «π global»).
 
 ## Cómo funciona
 
@@ -31,6 +32,39 @@ hexadecimal) en la misma transacción. Se guarda cada ~5 s de cálculo y al
 pausar, cambiar de modo u ocultar la página; al volver, el cálculo sigue
 donde quedó. «Empezar de cero», en el panel, lo borra.
 
+## π global (servidor)
+
+Si la web tiene definida `PUBLIC_PI_SERVER`, no calcula por su cuenta: se
+conecta a un servidor que calcula π sin parar, y todos los visitantes ven el
+mismo número creciendo en vivo. Si el servidor no responde, la web vuelve a
+calcular en el navegador.
+
+El servidor (`server/`) es Node 24 + TypeScript sin dependencias y reutiliza
+`src/lib/spigot.ts`:
+
+- Calcula las bases 10, 26 y 4 por turnos, usando solo `CPU_DUTY` de una CPU
+  (por defecto 10 %, para caber en el plan Hobby de Railway).
+- Guarda en disco (`DATA_DIR`) los dígitos y el estado del spigot cada ≥15 s,
+  y también al recibir SIGTERM; al reiniciar sigue desde ahí.
+- `GET /api/info`, `GET /api/digits/:base` (gzip) y
+  `GET /api/stream/:base?from=N` (SSE con los lotes nuevos).
+
+### Desplegar en Railway
+
+1. **New Project → Deploy from GitHub repo** y elige este repositorio.
+   Railway lee `railway.json` y construye `server/Dockerfile`.
+2. En el servicio: **Volumes → New Volume**, montado en `/data`. Sin volumen
+   el progreso se pierde en cada despliegue.
+3. **Variables** (opcionales): `CPU_DUTY=0.1`, `BASES=10:2,26:1,4:1`.
+4. **Settings → Networking → Generate Domain** y copia la URL.
+5. **Usage → Usage limits**: pon un límite duro de 5 USD para que nunca se
+   pase del plan.
+6. En **Vercel**, añade la variable `PUBLIC_PI_SERVER` con esa URL (sin `/`
+   final) y vuelve a desplegar la web.
+
+En local: `pnpm server` (usa `server/data/`) y
+`PUBLIC_PI_SERVER=http://localhost:8787 pnpm dev`.
+
 ## Modos
 
 | Modo     | Base | Qué muestra                                                                  |
@@ -50,10 +84,12 @@ calculado en porciones de ~6 ms para no bloquear el hilo principal. Atajo: `/`.
 
 ## Comandos
 
-| Comando       | Acción                                     |
-| ------------- | ------------------------------------------ |
-| `pnpm dev`    | Servidor de desarrollo en `localhost:4321` |
-| `pnpm build`  | Genera el sitio estático en `./dist/`      |
-| `pnpm test`   | Tests (Vitest)                             |
-| `pnpm lint`   | ESLint                                     |
-| `pnpm format` | Prettier                                   |
+| Comando          | Acción                                     |
+| ---------------- | ------------------------------------------ |
+| `pnpm dev`       | Servidor de desarrollo en `localhost:4321` |
+| `pnpm build`     | Genera el sitio estático en `./dist/`      |
+| `pnpm test`      | Tests (Vitest)                             |
+| `pnpm lint`      | ESLint                                     |
+| `pnpm format`    | Prettier                                   |
+| `pnpm server`    | Servidor de cálculo global en `:8787`      |
+| `pnpm typecheck` | Tipos de la web y del servidor             |

@@ -28,4 +28,8 @@ export type FromWorker =
     | BatchMessage
     | { type: 'reset-done' }
     /** Si la persistencia funciona en este navegador. */
-    | { type: 'storage'; available: boolean };
+    | { type: 'storage'; available: boolean }
+    /** Conectado al cálculo global del servidor. */
+    | { type: 'global'; startedAt: number; duty: number }
+    /** El servidor global no responde: hay que calcular localmente. */
+    | { type: 'unavailable' };

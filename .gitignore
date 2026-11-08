@@ -28,3 +28,5 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+# datos del servidor en local
+server/data/
