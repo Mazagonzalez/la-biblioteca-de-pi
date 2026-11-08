@@ -9,6 +9,12 @@ import {
     type ModeId,
     type ModeView,
 } from '@/lib/modes';
+import {
+    loadMemento,
+    mementoAt,
+    saveMemento,
+    type Memento,
+} from '@/lib/memento';
 import type { RunRecord } from '@/lib/stats';
 import { ColorModeView } from '@/lib/ui/color-mode';
 import { $ } from '@/lib/ui/dom';
@@ -297,6 +303,80 @@ searchForm.addEventListener('submit', () => {
     if (window.matchMedia('(max-width: 1023px)').matches)
         openSearch(false);
 });
+
+// --- Tu recuerdo -------------------------------------------------------
+// El decimal por el que iba π la primera vez que este navegador abrió la
+// página. Se guarda para siempre y se puede volver a él.
+
+const mementoBox = $(document, '[data-memento]');
+const mementoDigit = $(mementoBox, '[data-memento-digit]');
+const mementoPos = $(mementoBox, '[data-memento-pos]');
+const mementoWhen = $(mementoBox, '[data-memento-when]');
+const mementoSince = $(mementoBox, '[data-memento-since]');
+let memento: Memento | null = loadMemento();
+/** Posición a la que saltar en cuanto esté calculada. */
+let pendingReveal = 0;
+
+function showMemento(m: Memento): void {
+    mementoBox.hidden = false;
+    mementoDigit.textContent = String(m.digit);
+    mementoPos.textContent = `decimal nº ${fmtInt(m.position)}`;
+    mementoWhen.textContent = `Llegaste el ${longDate.format(m.at)}, cuando ${m.global ? 'π' : 'tu π'} iba justo por aquí.`;
+    updateMementoSince(engine.stream(10));
+}
+
+function updateMementoSince(stream: PiStream): void {
+    if (!memento || stream.base !== 10) return;
+    const grown = stream.length - memento.position;
+    mementoSince.textContent =
+        grown > 0
+            ? `Desde entonces creció ${fmtInt(grown)} ${grown === 1 ? 'decimal' : 'decimales'} más.`
+            : '';
+}
+
+function revealMemento(position: number): void {
+    const mode = textModeFor(10);
+    setMode(mode);
+    const stream = engine.stream(10);
+    if (stream.length < position) {
+        pendingReveal = position;
+        return;
+    }
+    pendingReveal = 0;
+    (viewFor(mode.id) as TextModeView).reveal(position - 1, 1);
+}
+
+engine.onBatch((stream) => {
+    if (stream.base !== 10 || stream.length === 0) return;
+    if (!memento) {
+        memento = mementoAt(
+            stream.length,
+            stream.store.at(stream.length - 1),
+            engine.global !== null,
+        );
+        const saved = saveMemento(memento);
+        showMemento(memento);
+        const m = memento;
+        // Después del aviso de bienvenida, para que se lean los dos.
+        window.setTimeout(() => {
+            toast.show(
+                `Tu decimal es el nº ${fmtInt(m.position)}: un ${m.digit}`,
+                saved
+                    ? 'Por ahí iba π cuando llegaste. Lo guardamos como tu recuerdo, en el panel.'
+                    : 'Por ahí iba π cuando llegaste. Este navegador no deja guardarlo.',
+                7000,
+            );
+        }, 5600);
+    }
+    updateMementoSince(stream);
+    if (pendingReveal && stream.length >= pendingReveal)
+        revealMemento(pendingReveal);
+});
+
+$(mementoBox, '[data-memento-go]').addEventListener('click', () => {
+    if (memento) revealMemento(memento.position);
+});
+if (memento) showMemento(memento);
 
 // --- Controles ---------------------------------------------------------
 

@@ -88,6 +88,20 @@ En local: `pnpm server` (usa `server/data/`) y
 | Sonido   | 10   | Escala pentatónica con Web Audio, volumen y tempo independientes del cálculo                                                                                  |
 | Dibujo   | 10   | Hilos (cada decimal unido al siguiente), Mandala (caminata de 10 direcciones en caleidoscopio) o Constelaciones (cada grupo de decimales es una constelación) |
 
+## Tu recuerdo
+
+La primera vez que un navegador abre la página se guarda en `localStorage`
+el decimal por el que iba π en ese momento (`src/lib/memento.ts`). El panel
+lo muestra con la fecha y cuánto ha crecido π desde entonces, y «Ver dónde»
+salta a ese decimal y lo resalta.
+
+## Analíticas
+
+Vercel Web Analytics (visitas, sin cookies) y Speed Insights (rendimiento
+real) se cargan desde `src/layouts/Layout.astro`. Hay que activarlos en el
+proyecto de Vercel (pestañas **Analytics** y **Speed Insights**); en local
+solo cargan en modo de depuración y no envían nada.
+
 ## Buscador
 
 Cifras → base 10 (p. ej. una fecha); letras → base 26 (p. ej. un nombre).
