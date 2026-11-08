@@ -1,5 +1,5 @@
 /**
- * Servidor de π infinito: calcula π sin parar y lo sirve a todos los
+ * Servidor de La Biblioteca de π: calcula π sin parar y lo sirve a todos los
  * visitantes.
  *
  *   GET /health                    → "ok"
@@ -274,7 +274,7 @@ const server = createServer((req, res) => {
         return send(
             res,
             200,
-            'π infinito · servidor de cálculo. Ver /api/info',
+            'La Biblioteca de π · servidor de cálculo. Ver /api/info',
         );
     }
     send(res, 404, 'no encontrado');

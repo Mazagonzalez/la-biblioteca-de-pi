@@ -11,9 +11,15 @@ interface Props {
 }
 
 const {
-    title = 'π infinito',
-    description = 'π calculado sin fin, dígito a dígito, en tu navegador. Mira su aleatoriedad mientras crece.',
+    title = 'La Biblioteca de π · Todo está aquí, en algún lugar',
+    description = 'π calculado sin fin en tu navegador. Como la biblioteca de Borges, quizá contenga todo: búscate en sus dígitos y mira su aleatoriedad crecer.',
 } = Astro.props;
+
+const site = Astro.site ?? Astro.url;
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL('/og.png', site).href;
+const ogImageAlt =
+    'La Biblioteca de π: un mandala dibujado con los decimales de π junto al lema «Todo está aquí, en algún lugar».';
 ---
 
 <html lang="es" class="h-full">
@@ -28,7 +34,26 @@ const {
         <meta name="theme-color" content="#09090b" />
         <title>{title}</title>
         <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="La Biblioteca de π" />
+        <meta property="og:locale" content="es_CO" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={ogImageAlt} />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={ogImage} />
+        <meta name="twitter:image:alt" content={ogImageAlt} />
     </head>
     <body class="h-full overflow-hidden bg-void font-sans text-fg antialiased">
         <slot />
