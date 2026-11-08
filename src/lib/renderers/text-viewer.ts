@@ -53,6 +53,8 @@ export class TextViewer {
     private expectedTop = -1;
     private touching = false;
     private measured = false;
+    private highlight: { start: number; end: number } | null = null;
+    private highlightVersion = 0;
 
     constructor(root: HTMLElement, options: TextViewerOptions = {}) {
         this.root = root;
@@ -122,13 +124,29 @@ export class TextViewer {
         return row * this.perRow;
     }
 
-    /** Lleva el símbolo `index` a la parte superior y deja de seguir. */
+    /** Lleva el símbolo `index` al tercio superior y deja de seguir. */
     scrollToIndex(index: number): void {
         this.setFollow(false);
         const row = Math.floor(index / this.perRow);
         this.setRealTop(
-            this.padTop + row * this.rowHeight - this.rowHeight,
+            this.padTop +
+                row * this.rowHeight -
+                this.root.clientHeight / 3,
         );
+        this.invalidate();
+    }
+
+    /** Resalta [start, start + length) (p. ej. un resultado de búsqueda). */
+    setHighlight(start: number, length: number): void {
+        this.highlight = { start, end: start + length };
+        this.highlightVersion++;
+        this.invalidate();
+    }
+
+    clearHighlight(): void {
+        if (!this.highlight) return;
+        this.highlight = null;
+        this.highlightVersion++;
         this.invalidate();
     }
 
@@ -282,7 +300,12 @@ export class TextViewer {
             const start = index * perRow;
             const end = Math.min(total, start + perRow);
             const isLast = index === rowCount - 1;
-            const key = `${index}|${end - start}|${perRow}|${isLast ? 1 : 0}`;
+            const hl = this.highlight;
+            const marked =
+                hl !== null &&
+                hl.start < start + perRow &&
+                hl.end > start;
+            const key = `${index}|${end - start}|${perRow}|${isLast ? 1 : 0}|${marked ? this.highlightVersion : 0}`;
             if (row.key === key) continue;
             if (row.key === 'hidden') row.el.style.display = '';
             row.key = key;
@@ -317,7 +340,26 @@ export class TextViewer {
             if (i > 0 && i % BLOCK === 0) chars.push(32);
             chars.push(codes[this.buffer[i]]);
         }
-        row.text.textContent = String.fromCharCode(...chars);
+        const text = String.fromCharCode(...chars);
+        const hl = this.highlight;
+        if (hl && hl.start < end && hl.end > start) {
+            // Desplazamiento en caracteres: un espacio cada BLOCK símbolos.
+            const at = (i: number) => i + Math.floor(i / BLOCK);
+            const a = Math.max(0, hl.start - start);
+            const b = Math.min(count, hl.end - start);
+            const from = at(a);
+            const to = at(b - 1) + 1;
+            const mark = document.createElement('mark');
+            mark.className = 'vrow-mark';
+            mark.textContent = text.slice(from, to);
+            row.text.replaceChildren(
+                text.slice(0, from),
+                mark,
+                text.slice(to),
+            );
+        } else {
+            row.text.textContent = text;
+        }
         row.el.classList.toggle('is-last', isLast);
     }
 

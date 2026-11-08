@@ -129,6 +129,9 @@ export class StatsPanel {
         hist.append(plot, labelsRow, devRow);
 
         this.el.base.textContent = String(base);
+        const unit = this.root.querySelector('[data-s-unit]');
+        if (unit)
+            unit.textContent = base === 26 ? 'letras' : 'dígitos';
         this.el.df.textContent = String(base - 1);
         this.el.expected.textContent = `esperado ${fmtDecimal(100 / base, base > 10 ? 2 : 0)}${THIN}%`;
     }

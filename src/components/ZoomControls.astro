@@ -1,0 +1,44 @@
+---
+interface Props {
+    label?: string;
+}
+const { label } = Astro.props;
+---
+
+<div class="zoom" role="group" aria-label="Zoom">
+    <button
+        type="button"
+        class="zoom-btn"
+        data-zoom-out
+        aria-label="Alejar"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+                d="M6 12h12"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+            ></path>
+        </svg>
+    </button>
+    {label !== undefined && (
+        <span class="zoom-label" data-cell-size>
+            {label}
+        </span>
+    )}
+    <button
+        type="button"
+        class="zoom-btn"
+        data-zoom-in
+        aria-label="Acercar"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+                d="M6 12h12M12 6v12"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+            ></path>
+        </svg>
+    </button>
+</div>

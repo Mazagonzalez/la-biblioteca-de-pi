@@ -73,11 +73,11 @@ body > * {
     color: var(--color-fg);
 }
 
-.mode-tab[aria-current='true'] {
+.mode-tab[aria-current] {
     color: var(--color-fg);
 }
 
-.mode-tab[aria-current='true']::after {
+.mode-tab[aria-current]::after {
     transform: scaleX(1);
 }
 
@@ -93,7 +93,7 @@ body > * {
     font-variant-numeric: tabular-nums;
 }
 
-.mode-tab[aria-current='true'] .mode-tab-index {
+.mode-tab[aria-current] .mode-tab-index {
     color: var(--color-gold);
 }
 
@@ -153,8 +153,28 @@ body > * {
 /* ---------------------------------------------------------------------
    Visor de dígitos virtualizado
    --------------------------------------------------------------------- */
+/* Transición entre modos: fundido con un leve desenfoque y desplazamiento. */
 .mode-view {
-    animation: view-in 0.7s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+    position: absolute;
+    inset: 0;
+    transition:
+        opacity 0.55s ease,
+        transform 0.7s cubic-bezier(0.2, 0.7, 0.1, 1),
+        filter 0.55s ease,
+        visibility 0s linear 0s;
+}
+
+.mode-view[data-active='false'] {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(10px) scale(0.995);
+    filter: blur(6px);
+    transition:
+        opacity 0.3s ease,
+        transform 0.4s ease,
+        filter 0.3s ease,
+        visibility 0s linear 0.4s;
 }
 
 .viewer {

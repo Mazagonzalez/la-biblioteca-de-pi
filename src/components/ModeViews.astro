@@ -1,0 +1,196 @@
+---
+import { DIGIT_PALETTE } from '@/lib/palette';
+import FollowButton from './FollowButton.astro';
+import ZoomControls from './ZoomControls.astro';
+---
+
+<!-- 01 · Dígitos -->
+<section
+    class="mode-view"
+    data-mode-view="digits"
+    data-active="true"
+    aria-label="Decimales de π en base 10"
+>
+    <div class="h-full" data-viewer tabindex="0"></div>
+    <FollowButton />
+</section>
+
+<!-- 02 · Letras -->
+<section
+    class="mode-view"
+    data-mode-view="letters"
+    data-active="false"
+    aria-label="π en base 26, con A = 0 y Z = 25"
+>
+    <div class="h-full" data-viewer tabindex="0"></div>
+    <p class="mode-caption">π en base 26 · A = 0, B = 1 … Z = 25</p>
+    <FollowButton />
+</section>
+
+<!-- 03 · Color -->
+<section
+    class="mode-view"
+    data-mode-view="color"
+    data-active="false"
+    aria-label="Cada decimal de π como un píxel de color"
+>
+    <div class="h-full" data-pixels></div>
+    <div
+        class="pixel-tip"
+        data-pixel-tip
+        data-visible="false"
+        aria-hidden="true"
+    ></div>
+    <div class="mode-dock">
+        <ul class="legend" aria-label="Paleta: un color por dígito">
+            {DIGIT_PALETTE.map((color, digit) => (
+                <li>
+                    <span
+                        class="legend-swatch"
+                        style={`background:${color}`}
+                    />
+                    {digit}
+                </li>
+            ))}
+        </ul>
+        <ZoomControls label="4 px" />
+    </div>
+    <FollowButton />
+</section>
+
+<!-- 04 · Caminata -->
+<section
+    class="mode-view"
+    data-mode-view="walk"
+    data-active="false"
+    aria-label="π en base 4 como caminata aleatoria"
+>
+    <div class="walk-stage h-full" data-walk></div>
+    <div class="walk-info">
+        <div class="walk-legend" aria-hidden="true">
+            <span>0 ↑</span>
+            <span>1 →</span>
+            <span>2 ↓</span>
+            <span>3 ←</span>
+        </div>
+        <dl class="walk-stats">
+            <div>
+                <dt>pasos</dt>
+                <dd data-w-steps>0</dd>
+            </div>
+            <div>
+                <dt>posición</dt>
+                <dd data-w-pos>(0, 0)</dd>
+            </div>
+            <div>
+                <dt>distancia al origen</dt>
+                <dd>
+                    <span data-w-dist>0</span>{' '}
+                    <span class="text-mute">
+                        · √n ≈ <span data-w-sqrt>0</span>
+                    </span>
+                </dd>
+            </div>
+        </dl>
+        <p class="walk-note">
+            En una caminata aleatoria la distancia típica al origen
+            crece como √n.
+        </p>
+    </div>
+    <div class="mode-dock justify-end">
+        <button
+            type="button"
+            class="pill-btn"
+            data-w-auto
+            data-visible="false"
+        >
+            Encuadre automático
+        </button>
+        <ZoomControls />
+    </div>
+</section>
+
+<!-- 05 · Sonido -->
+<section
+    class="mode-view sound"
+    data-mode-view="sound"
+    data-active="false"
+    data-playing="false"
+    aria-label="π como música"
+>
+    <div class="sound-stage">
+        <div class="tape-wrap">
+            <div
+                class="sound-ring"
+                data-ring
+                aria-hidden="true"
+            ></div>
+            <div class="tape" data-tape aria-hidden="true"></div>
+        </div>
+        <p class="sound-pos" data-sound-pos aria-live="off">
+            decimal n.º 1
+        </p>
+        <button
+            type="button"
+            class="sound-play"
+            data-play
+            aria-pressed="false"
+            aria-label="Escuchar π"
+        >
+            <svg
+                viewBox="0 0 24 24"
+                class="icon-play"
+                aria-hidden="true"
+            >
+                <path d="M8.5 5.8v12.4a.8.8 0 0 0 1.2.7l9.8-6.2a.8.8 0 0 0 0-1.4L9.7 5.1a.8.8 0 0 0-1.2.7Z"></path>
+            </svg>
+            <svg
+                viewBox="0 0 24 24"
+                class="icon-stop"
+                aria-hidden="true"
+            >
+                <rect
+                    x="7"
+                    y="7"
+                    width="10"
+                    height="10"
+                    rx="1.5"
+                ></rect>
+            </svg>
+        </button>
+        <p class="sound-hint" data-sound-hint>
+            Pulsa para escuchar π
+        </p>
+        <p class="sound-starve">
+            Esperando a que se calculen más decimales…
+        </p>
+    </div>
+    <div class="sound-controls">
+        <label class="slider">
+            <span class="slider-label">Volumen</span>
+            <input
+                type="range"
+                min="0"
+                max="100"
+                value="60"
+                data-volume
+            />
+        </label>
+        <label class="slider">
+            <span class="slider-label">
+                Tempo{' '}
+                <span class="text-dim tabular-nums">
+                    <span data-tempo-label>4</span> notas/s
+                </span>
+            </span>
+            <input
+                type="range"
+                min="1"
+                max="16"
+                step="1"
+                value="4"
+                data-tempo
+            />
+        </label>
+    </div>
+</section>

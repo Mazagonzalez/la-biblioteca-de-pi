@@ -1,18 +1,14 @@
 ---
-const modes = [
-    { id: 'digits', label: 'Dígitos', base: 10, ready: true },
-    { id: 'letters', label: 'Letras', base: 26, ready: false },
-    { id: 'color', label: 'Color', base: 10, ready: false },
-    { id: 'walk', label: 'Caminata', base: 4, ready: false },
-    { id: 'sound', label: 'Sonido', base: 10, ready: false },
-];
+import { MODES } from '@/lib/modes';
+import SearchBar from './SearchBar.astro';
 ---
 
-<header class="col-span-full flex flex-wrap items-center gap-x-10 gap-y-3 border-b border-line px-4 pt-4 pb-0 sm:px-8 lg:flex-nowrap lg:px-10 lg:py-0">
+<header class="relative col-span-full flex flex-wrap items-center gap-x-10 gap-y-3 border-b border-line px-4 pt-4 pb-0 sm:px-8 lg:flex-nowrap lg:px-10 lg:py-0">
     <a
-        href="/"
+        href="#digitos"
         class="group flex items-baseline gap-2.5 lg:py-5"
         aria-label="π infinito, inicio"
+        data-home
     >
         <span class="font-display text-[2.6rem] leading-[0.7] text-gold italic transition-transform duration-500 group-hover:-rotate-6">
             π
@@ -26,36 +22,37 @@ const modes = [
         aria-label="Modos de visualización"
         class="order-last -mx-4 w-[calc(100%+2rem)] sm:-mx-8 sm:w-[calc(100%+4rem)] lg:order-none lg:mx-0 lg:w-auto lg:self-stretch"
     >
-        <ul class="no-scrollbar flex h-full gap-6 overflow-x-auto px-4 sm:px-8 lg:gap-8 lg:px-0">
-            {modes.map((mode, i) => (
+        <ul class="no-scrollbar flex h-full gap-6 overflow-x-auto px-4 sm:px-8 lg:gap-7 lg:px-0 xl:gap-8">
+            {MODES.map((mode, i) => (
                 <li class="flex">
-                    <button
-                        type="button"
+                    <a
+                        href={`#${mode.hash}`}
                         class="mode-tab"
                         data-mode={mode.id}
-                        aria-current={i === 0 ? 'true' : undefined}
-                        disabled={!mode.ready}
-                        title={
-                            mode.ready
-                                ? `${mode.label} · base ${mode.base}`
-                                : `${mode.label}: próximamente`
-                        }
+                        aria-current={i === 0 ? 'page' : undefined}
+                        title={`${mode.description} · base ${mode.base}`}
                     >
                         <span class="mode-tab-index">
                             {String(i + 1).padStart(2, '0')}
                         </span>
                         {mode.label}
-                    </button>
+                    </a>
                 </li>
             ))}
         </ul>
     </nav>
 
-    <div class="ml-auto flex items-center gap-5">
-        <div class="text-right leading-tight" aria-live="off">
+    <div class="ml-auto flex items-center gap-3 sm:gap-5">
+        <SearchBar />
+        <div
+            class="text-right leading-tight lg:max-xl:hidden"
+            aria-live="off"
+        >
             <div class="font-mono text-sm text-fg tabular-nums">
                 <span data-h-count>0</span>
-                <span class="text-mute">díg.</span>
+                <span class="text-mute" data-h-unit>
+                    díg.
+                </span>
             </div>
             <div
                 class="font-mono text-[11px] text-mute tabular-nums"

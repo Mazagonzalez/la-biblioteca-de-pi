@@ -18,14 +18,27 @@ frameworks de UI. Todo corre en el cliente; se despliega como sitio estático.
 - **Almacén** en trozos de `Uint8Array` crecientes (`src/lib/store.ts`).
 - **Estadísticas incrementales** (`src/lib/stats.ts`): histograma, χ² con
   p-valor (gamma incompleta regularizada) y rachas.
+- **Renderers** en `src/lib/renderers/` (texto, píxeles, caminata) y audio en
+  `src/lib/audio.ts`.
 - **Visor virtualizado** (`src/lib/renderers/text-viewer.ts`): solo pinta las
   filas visibles, con «seguir al último».
 
-## Estado
+## Modos
 
-- [x] Núcleo: spigot, worker, modo Dígitos y panel de aleatoriedad
-- [ ] Letras (base 26), Color, Caminata (base 4), Sonido
-- [ ] Buscador
+| Modo     | Base | Qué muestra                                                                  |
+| -------- | ---- | ---------------------------------------------------------------------------- |
+| Dígitos  | 10   | Texto en bloques de 10, virtualizado, con «seguir al último»                 |
+| Letras   | 26   | Lo mismo con A = 0 … Z = 25                                                  |
+| Color    | 10   | Un píxel por dígito (ImageData), paleta apta para daltonismo, zoom 1–16 px   |
+| Caminata | 4    | 0↑ 1→ 2↓ 3←, degradado por posición, encuadre automático, zoom y paneo       |
+| Sonido   | 10   | Escala pentatónica con Web Audio, volumen y tempo independientes del cálculo |
+
+## Buscador
+
+Cifras → base 10 (p. ej. una fecha); letras → base 26 (p. ej. un nombre).
+Usa Knuth–Morris–Pratt con estado entre lotes (`src/lib/search.ts`), así que
+no pierde coincidencias que cruzan el borde entre dos lotes, y revisa lo ya
+calculado en porciones de ~6 ms para no bloquear el hilo principal. Atajo: `/`.
 
 ## Comandos
 
