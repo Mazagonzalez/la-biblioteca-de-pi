@@ -1,7 +1,7 @@
 import type { PiStream } from './engine';
 
 export type ModeId =
-    'digits' | 'letters' | 'color' | 'walk' | 'sound';
+    'digits' | 'letters' | 'color' | 'walk' | 'sound' | 'draw';
 
 export interface ModeDef {
     id: ModeId;
@@ -47,6 +47,13 @@ export const MODES: readonly ModeDef[] = [
         base: 10,
         hash: 'sonido',
         description: 'Cada decimal es una nota pentatónica',
+    },
+    {
+        id: 'draw',
+        label: 'Dibujo',
+        base: 10,
+        hash: 'dibujo',
+        description: 'Los decimales como instrucciones para dibujar',
     },
 ];
 

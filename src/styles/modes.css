@@ -760,3 +760,108 @@
     color: var(--color-rose);
     border-color: var(--color-rose);
 }
+
+/* ---------------------------------------------------------------------
+   Dibujo
+   --------------------------------------------------------------------- */
+.draw-stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.draw-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Solo se ve lo del estilo activo. */
+.draw[data-style='threads'] [data-for='mandala'],
+.draw[data-style='mandala'] [data-for='threads'] {
+    display: none;
+}
+
+.draw-info {
+    position: absolute;
+    top: 1rem;
+    left: clamp(0.75rem, 3vw, 2.5rem);
+    max-width: 16rem;
+    pointer-events: none;
+}
+
+.draw-title {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-style: italic;
+    line-height: 1;
+    color: var(--color-gold);
+}
+
+.draw-info .walk-stats {
+    margin-top: 0.7rem;
+}
+
+.draw-info .walk-stats dt {
+    min-width: 7rem;
+}
+
+.seg {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0.2rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-line-strong);
+    background: rgb(21 21 23 / 0.82);
+    backdrop-filter: blur(14px);
+}
+
+.seg button {
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--color-dim);
+    transition:
+        color 0.2s ease,
+        background-color 0.25s ease;
+}
+
+.seg button:hover {
+    color: var(--color-fg);
+}
+
+.seg button[aria-pressed='true'] {
+    background: var(--color-gold-soft);
+    color: var(--color-gold);
+}
+
+.seg-label {
+    padding: 0 0.35rem 0 0.6rem;
+    font-size: 11px;
+    color: var(--color-mute);
+}
+
+@media (max-width: 639px) {
+    .draw-info .walk-stats dt {
+        min-width: 0;
+    }
+    .draw-title {
+        font-size: 1.3rem;
+    }
+    .seg button {
+        padding: 0.4rem 0.65rem;
+    }
+}
+
+/* La nota solo cuando el escenario es amplio; si no, tapa el dibujo. */
+.draw {
+    container-type: size;
+}
+
+@container (max-width: 1099px) {
+    .draw-info .walk-note {
+        display: none;
+    }
+}

@@ -12,6 +12,7 @@ import {
 import type { RunRecord } from '@/lib/stats';
 import { ColorModeView } from '@/lib/ui/color-mode';
 import { $ } from '@/lib/ui/dom';
+import { DrawModeView } from '@/lib/ui/draw-mode';
 import { SearchController } from '@/lib/ui/search';
 import { SoundModeView } from '@/lib/ui/sound-mode';
 import { StatsPanel } from '@/lib/ui/stats-panel';
@@ -52,6 +53,7 @@ const factories: Record<ModeId, (section: HTMLElement) => ModeView> =
         color: (s) => new ColorModeView(s),
         walk: (s) => new WalkModeView(s),
         sound: (s) => new SoundModeView(s),
+        draw: (s) => new DrawModeView(s),
     };
 const views = new Map<ModeId, ModeView>();
 
