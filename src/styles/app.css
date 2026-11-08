@@ -680,3 +680,41 @@ html[data-paused='true'] .vrow.is-last .vrow-caret {
     background: var(--color-gold);
     box-shadow: 0 0 12px rgb(216 176 106 / 0.8);
 }
+
+/* ---------------------------------------------------------------------
+   Tu recuerdo
+   --------------------------------------------------------------------- */
+.memento {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid rgb(216 176 106 / 0.22);
+    border-radius: 0.9rem;
+    background:
+        radial-gradient(
+            120% 140% at 0% 0%,
+            rgb(216 176 106 / 0.1),
+            transparent 60%
+        ),
+        rgb(255 255 255 / 0.015);
+}
+
+.memento-digit {
+    flex: none;
+    min-width: 2.2rem;
+    font-family: var(--font-display);
+    font-size: 3.2rem;
+    font-style: italic;
+    line-height: 0.9;
+    text-align: center;
+    color: var(--color-gold);
+    text-shadow: 0 0 24px rgb(216 176 106 / 0.35);
+}
+
+.memento-pos {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--color-fg);
+    font-variant-numeric: tabular-nums;
+}
