@@ -172,6 +172,40 @@
     opacity: 0;
 }
 
+/* Varios controles juntos a la izquierda del dock (el zoom va a la derecha). */
+.dock-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    pointer-events: none;
+}
+
+.dock-group > * {
+    pointer-events: auto;
+}
+
+[data-mode-view='color']:not([data-style='color']) [data-for='color'],
+[data-mode-view='color']:not([data-style='bw']) [data-for='bw'] {
+    display: none;
+}
+
+/* En el celular: la leyenda arriba y el estilo junto al zoom, en dos filas. */
+@media (max-width: 639px) {
+    .dock-group {
+        display: contents;
+    }
+
+    [data-mode-view='color'] .legend {
+        order: -1;
+    }
+}
+
+/* El negro de los píxeles es el del fondo: un borde para verlo. */
+.legend[data-for='bw'] .legend-swatch {
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.35);
+}
+
 .legend {
     display: flex;
     flex-wrap: wrap;

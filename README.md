@@ -86,7 +86,7 @@ En local: `pnpm server` (usa `server/data/`) y
 | -------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Dígitos  | 10   | Texto en bloques de 10, virtualizado, con «seguir al último»                                                                                                  |
 | Letras   | 26   | Lo mismo con A = 0 … Z = 25                                                                                                                                   |
-| Color    | 10   | Un píxel por dígito (ImageData), paleta apta para daltonismo, zoom 1–16 px                                                                                    |
+| Color    | 10   | Un píxel por dígito (ImageData), paleta apta para daltonismo o blanco y negro (0–4 negro, 5–9 blanco), zoom 1–16 px                                           |
 | Caminata | 4    | 0↑ 1→ 2↓ 3←, degradado por posición, encuadre automático, zoom y paneo                                                                                        |
 | Sonido   | 10   | Escala pentatónica con Web Audio, volumen y tempo independientes del cálculo                                                                                  |
 | Dibujo   | 10   | Hilos (cada decimal unido al siguiente), Mandala (caminata de 10 direcciones en caleidoscopio) o Constelaciones (cada grupo de decimales es una constelación) |
