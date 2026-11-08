@@ -171,6 +171,45 @@ engine.onRecord((stream, record) => {
     toast.show(title, detail);
 });
 
+// --- Guardado local ----------------------------------------------------
+
+const savedLine = $(document, '[data-s-saved]');
+const resetBtn = $<HTMLButtonElement>(document, '[data-reset]');
+let resetTimer = 0;
+
+engine.onRestore((stream) => {
+    if (stream.base !== engine.activeBase) return;
+    const unit = stream.base === 26 ? 'letras' : 'dígitos';
+    toast.show(
+        'Seguimos donde lo dejaste',
+        `${fmtInt(stream.length)} ${unit} recuperados de este navegador.`,
+    );
+});
+
+engine.onState(() => {
+    if (engine.storage === null) return;
+    savedLine.textContent = engine.storage
+        ? 'Tu progreso se guarda en este navegador.'
+        : 'Este navegador no permite guardar: al recargar se empieza de cero.';
+    resetBtn.hidden = !engine.storage;
+});
+
+resetBtn.addEventListener('click', () => {
+    if (resetBtn.dataset.confirm === 'true') {
+        clearTimeout(resetTimer);
+        resetBtn.disabled = true;
+        resetBtn.textContent = 'Borrando…';
+        engine.reset();
+        return;
+    }
+    resetBtn.dataset.confirm = 'true';
+    resetBtn.textContent = '¿Seguro? Se borra todo lo calculado';
+    resetTimer = window.setTimeout(() => {
+        resetBtn.dataset.confirm = 'false';
+        resetBtn.textContent = 'Empezar de cero';
+    }, 4000);
+});
+
 // --- Búsqueda ----------------------------------------------------------
 
 function textModeFor(base: 10 | 26): ModeDef {

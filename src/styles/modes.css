@@ -729,3 +729,34 @@
         transform: scale(1.15);
     }
 }
+
+/* ---------------------------------------------------------------------
+   Guardado local
+   --------------------------------------------------------------------- */
+.saved-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.4rem 1rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--color-line);
+    font-size: 11.5px;
+    color: var(--color-mute);
+}
+
+.text-link {
+    font-size: 11.5px;
+    color: var(--color-dim);
+    border-bottom: 1px dotted var(--color-faint);
+    transition: color 0.2s ease;
+}
+
+.text-link:hover {
+    color: var(--color-fg);
+}
+
+.text-link[data-confirm='true'] {
+    color: var(--color-rose);
+    border-color: var(--color-rose);
+}

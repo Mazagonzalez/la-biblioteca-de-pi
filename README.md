@@ -23,6 +23,14 @@ frameworks de UI. Todo corre en el cliente; se despliega como sitio estático.
 - **Visor virtualizado** (`src/lib/renderers/text-viewer.ts`): solo pinta las
   filas visibles, con «seguir al último».
 
+## Progreso guardado
+
+Cada navegador guarda su progreso en IndexedDB (`src/lib/persist.ts`): los
+dígitos en trozos de 64 KiB y el estado del spigot (`q`, `r`, `t` en
+hexadecimal) en la misma transacción. Se guarda cada ~5 s de cálculo y al
+pausar, cambiar de modo u ocultar la página; al volver, el cálculo sigue
+donde quedó. «Empezar de cero», en el panel, lo borra.
+
 ## Modos
 
 | Modo     | Base | Qué muestra                                                                  |

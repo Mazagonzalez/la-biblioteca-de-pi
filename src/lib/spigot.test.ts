@@ -67,6 +67,23 @@ describe('PiSpigot', () => {
         ).toBe(expected);
     });
 
+    it('snapshot → JSON → restore continúa exactamente igual', () => {
+        for (const base of [4, 10, 26]) {
+            const reference = piDigits(base, 500).digits;
+            const spigot = new PiSpigot(base);
+            spigot.next();
+            for (let i = 0; i < 300; i++) spigot.next();
+            const snap = JSON.parse(
+                JSON.stringify(spigot.snapshot()),
+            );
+            const resumed = PiSpigot.restore(snap);
+            const rest = Array.from({ length: 200 }, () =>
+                resumed.next(),
+            );
+            expect(rest).toEqual(Array.from(reference.subarray(300)));
+        }
+    });
+
     it('rechaza bases inválidas', () => {
         expect(() => new PiSpigot(1)).toThrow(RangeError);
         expect(() => new PiSpigot(2.5)).toThrow(RangeError);
