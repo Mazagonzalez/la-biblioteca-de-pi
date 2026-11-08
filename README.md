@@ -73,6 +73,9 @@ El servidor (`server/`) es Node 24 + TypeScript sin dependencias y reutiliza
    pase del plan.
 6. En **Vercel**, añade la variable `PUBLIC_PI_SERVER` con esa URL (sin `/`
    final) y vuelve a desplegar la web.
+7. Pon esa misma URL en `connect-src` de la cabecera
+   `Content-Security-Policy` de `vercel.json`. Si no coincide, el navegador
+   bloquea la conexión y la web calcula π por su cuenta.
 
 En local: `pnpm server` (usa `server/data/`) y
 `PUBLIC_PI_SERVER=http://localhost:8787 pnpm dev`.
@@ -98,9 +101,10 @@ salta a ese decimal y lo resalta.
 ## Analíticas
 
 Vercel Web Analytics (visitas, sin cookies) y Speed Insights (rendimiento
-real) se cargan desde `src/layouts/Layout.astro`. Hay que activarlos en el
-proyecto de Vercel (pestañas **Analytics** y **Speed Insights**); en local
-solo cargan en modo de depuración y no envían nada.
+real) se cargan desde `src/layouts/Layout.astro`, **solo en producción**:
+cuando Vercel construye con `VERCEL_ENV=production`. En local y en las
+vistas previas de los PR no se incluyen. Hay que activarlos en el proyecto
+de Vercel (pestañas **Analytics** y **Speed Insights**).
 
 ## Buscador
 

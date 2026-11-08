@@ -319,7 +319,8 @@ html[data-paused='true'] .vrow.is-last .vrow-caret {
     transition:
         opacity 0.35s ease,
         transform 0.45s cubic-bezier(0.2, 0.7, 0.1, 1),
-        border-color 0.3s ease;
+        border-color 0.3s ease,
+        visibility 0s linear 0s;
 }
 
 .follow-btn:hover {
@@ -330,10 +331,18 @@ html[data-paused='true'] .vrow.is-last .vrow-caret {
     color: var(--color-gold);
 }
 
+/* Oculto también para el teclado y los lectores de pantalla; `visibility`
+   espera a que termine el fundido. */
 .follow-btn[data-visible='false'] {
     opacity: 0;
+    visibility: hidden;
     transform: translateY(0.75rem);
     pointer-events: none;
+    transition:
+        opacity 0.35s ease,
+        transform 0.45s cubic-bezier(0.2, 0.7, 0.1, 1),
+        border-color 0.3s ease,
+        visibility 0s linear 0.35s;
 }
 
 /* ---------------------------------------------------------------------

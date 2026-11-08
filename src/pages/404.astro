@@ -1,0 +1,31 @@
+---
+import Layout from '@/layouts/Layout.astro';
+---
+
+<Layout
+    title="Página no encontrada · La Biblioteca de π"
+    description="Esta página no existe. Aunque, en algún lugar de π, seguro que sí."
+    noindex
+>
+    <main class="flex h-full flex-col items-center justify-center gap-6 px-4 text-center">
+        <p
+            class="font-display text-[7rem] leading-none text-gold italic sm:text-[10rem]"
+            aria-hidden="true"
+        >
+            π
+        </p>
+        <h1 class="font-display text-3xl leading-tight text-fg sm:text-4xl">
+            Esta página no está en la biblioteca
+        </h1>
+        <p class="max-w-md text-dim">
+            Aunque, si π es normal, en algún lugar de sus decimales
+            seguro que sí.
+        </p>
+        <a
+            href="/"
+            class="mt-2 rounded-full border border-line-strong px-5 py-2 text-sm text-fg transition-colors hover:border-gold"
+        >
+            Volver a π
+        </a>
+    </main>
+</Layout>
