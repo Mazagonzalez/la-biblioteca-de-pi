@@ -106,3 +106,8 @@ calculado en porciones de ~6 ms para no bloquear el hilo principal. Atajo: `/`.
 | `pnpm format`    | Prettier                                   |
 | `pnpm server`    | Servidor de cálculo global en `:8787`      |
 | `pnpm typecheck` | Tipos de la web y del servidor             |
+
+## Licencia
+
+[MIT](LICENSE) © 2026 Carlos Maza. Puedes usar, copiar y modificar el código
+libremente, siempre que conserves el aviso de autoría.
