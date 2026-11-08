@@ -23,7 +23,9 @@ import { WalkModeView } from '@/lib/ui/walk-mode';
 const MIN_RECORD_TOAST = 3;
 
 const initial = modeByHash(location.hash) ?? MODES[0];
-const engine = new PiEngine(initial.base);
+const engine = new PiEngine(initial.base, {
+    server: import.meta.env.PUBLIC_PI_SERVER || undefined,
+});
 const panel = new StatsPanel($(document, '[data-stats]'));
 const toast = new Toast($(document, '[data-toast]'));
 
@@ -177,20 +179,50 @@ const savedLine = $(document, '[data-s-saved]');
 const resetBtn = $<HTMLButtonElement>(document, '[data-reset]');
 let resetTimer = 0;
 
+const longDate = new Intl.DateTimeFormat('es', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+});
+
 engine.onRestore((stream) => {
     if (stream.base !== engine.activeBase) return;
     const unit = stream.base === 26 ? 'letras' : 'dígitos';
+    if (engine.global) {
+        toast.show(
+            'Conectado al cálculo global',
+            `${fmtInt(stream.length)} ${unit} calculados sin parar desde el ${longDate.format(engine.global.startedAt)}.`,
+        );
+        return;
+    }
+    if (stream.length === 0) return;
     toast.show(
         'Seguimos donde lo dejaste',
         `${fmtInt(stream.length)} ${unit} recuperados de este navegador.`,
     );
 });
 
+let warnedFallback = false;
 engine.onState(() => {
+    if (engine.global) {
+        savedLine.textContent = `π global: se calcula sin parar en el servidor desde el ${longDate.format(engine.global.startedAt)} y todos ven el mismo.`;
+        resetBtn.hidden = true;
+        return;
+    }
+    if (engine.fellBack && !warnedFallback) {
+        warnedFallback = true;
+        toast.show(
+            'El cálculo global no responde',
+            'Mientras tanto, π se calcula en este navegador.',
+        );
+    }
     if (engine.storage === null) return;
+    const prefix = engine.fellBack
+        ? 'Sin conexión al cálculo global. '
+        : '';
     savedLine.textContent = engine.storage
-        ? 'Tu progreso se guarda en este navegador.'
-        : 'Este navegador no permite guardar: al recargar se empieza de cero.';
+        ? `${prefix}Tu progreso se guarda en este navegador.`
+        : `${prefix}Este navegador no permite guardar: al recargar se empieza de cero.`;
     resetBtn.hidden = !engine.storage;
 });
 

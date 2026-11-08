@@ -33,6 +33,7 @@ export function fmtDuration(ms: number): string {
     const m = Math.floor((total % 3600) / 60);
     const s = total % 60;
     const ss = String(s).padStart(2, '0');
+    if (h >= 48) return `${Math.floor(h / 24)} d ${h % 24} h`;
     if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${ss}`;
     return `${m}:${ss}`;
 }

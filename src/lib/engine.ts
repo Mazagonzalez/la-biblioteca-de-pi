@@ -1,4 +1,5 @@
 import type { FromWorker, ToWorker } from './protocol';
+import { RemoteSource, type GlobalInfo } from './remote';
 import { SymbolStats, type RunRecord } from './stats';
 import { DigitStore } from './store';
 
@@ -63,12 +64,18 @@ type RecordListener = (stream: PiStream, record: RunRecord) => void;
 type StateListener = (engine: PiEngine) => void;
 type RestoreListener = (stream: PiStream) => void;
 
+export interface EngineOptions {
+    /** URL del servidor global; sin ella se calcula en el navegador. */
+    server?: string;
+}
+
 /**
- * Cliente del worker: guarda los dígitos que llegan por base, actualiza
- * las estadísticas y avisa a la interfaz.
+ * Recibe los dígitos (del worker local o del servidor global), los guarda
+ * por base, actualiza las estadísticas y avisa a la interfaz.
  */
 export class PiEngine {
-    private readonly worker: Worker;
+    private source: { send(msg: ToWorker): void };
+    private remote: RemoteSource | null = null;
     private readonly streams = new Map<number, PiStream>();
     private readonly batchListeners = new Set<BatchListener>();
     private readonly recordListeners = new Set<RecordListener>();
@@ -78,16 +85,22 @@ export class PiEngine {
     paused = false;
     /** null mientras no se sabe; luego, si IndexedDB funciona aquí. */
     storage: boolean | null = null;
+    /** Datos del cálculo global, o null si se calcula en el navegador. */
+    global: GlobalInfo | null = null;
+    /** Se quiso usar el servidor global pero no respondió. */
+    fellBack = false;
 
-    constructor(base: number) {
+    constructor(base: number, options: EngineOptions = {}) {
         this.activeBase = base;
-        this.worker = new Worker(
-            new URL('../workers/pi.worker.ts', import.meta.url),
-            { type: 'module' },
-        );
-        this.worker.onmessage = (event: MessageEvent<FromWorker>) =>
-            this.receive(event.data);
-        this.send({ type: 'setBase', base });
+        if (options.server) {
+            this.remote = new RemoteSource(options.server, (msg) =>
+                this.receive(msg),
+            );
+            this.source = this.remote;
+            this.send({ type: 'setBase', base });
+        } else {
+            this.source = this.startLocal();
+        }
 
         // Guarda el progreso al ocultar o cerrar la página.
         const flush = () => this.send({ type: 'flush' });
@@ -162,7 +175,23 @@ export class PiEngine {
     }
 
     private send(msg: ToWorker): void {
-        this.worker.postMessage(msg);
+        this.source.send(msg);
+    }
+
+    /** Arranca el cálculo en este navegador (worker + IndexedDB). */
+    private startLocal(): { send(msg: ToWorker): void } {
+        const worker = new Worker(
+            new URL('../workers/pi.worker.ts', import.meta.url),
+            { type: 'module' },
+        );
+        worker.onmessage = (event: MessageEvent<FromWorker>) =>
+            this.receive(event.data);
+        const source = {
+            send: (msg: ToWorker) => worker.postMessage(msg),
+        };
+        source.send({ type: 'setBase', base: this.activeBase });
+        if (this.paused) source.send({ type: 'pause' });
+        return source;
     }
 
     private emitState(): void {
@@ -172,6 +201,23 @@ export class PiEngine {
     private receive(msg: FromWorker): void {
         if (msg.type === 'reset-done') {
             location.reload();
+            return;
+        }
+        if (msg.type === 'global') {
+            this.global = {
+                startedAt: msg.startedAt,
+                duty: msg.duty,
+            };
+            this.emitState();
+            return;
+        }
+        if (msg.type === 'unavailable') {
+            this.remote?.dispose();
+            this.remote = null;
+            this.global = null;
+            this.fellBack = true;
+            this.source = this.startLocal();
+            this.emitState();
             return;
         }
         if (msg.type === 'storage') {
