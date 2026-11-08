@@ -1,0 +1,219 @@
+---
+---
+
+<aside
+    data-stats
+    data-open="false"
+    aria-label="Aleatoriedad"
+    class="stats relative border-t border-line bg-ink/70 backdrop-blur-xl lg:min-h-0 lg:overflow-y-auto lg:border-t-0 lg:border-l lg:bg-ink/40"
+>
+    <button
+        type="button"
+        data-stats-toggle
+        aria-expanded="false"
+        aria-controls="stats-body"
+        class="flex w-full items-center gap-4 px-4 py-3.5 text-left sm:px-8 lg:hidden"
+    >
+        <span class="label">Aleatoriedad</span>
+        <span
+            class="ml-auto font-mono text-xs text-dim tabular-nums"
+            data-s-summary
+        >
+            χ² — · p —
+        </span>
+        <svg
+            viewBox="0 0 24 24"
+            class="stats-chevron size-4 text-mute"
+            aria-hidden="true"
+        >
+            <path
+                d="m6 15 6-6 6 6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            ></path>
+        </svg>
+    </button>
+
+    <div class="stats-body" id="stats-body">
+        <div class="min-h-0 overflow-hidden">
+            <div class="no-scrollbar max-h-[58dvh] space-y-10 overflow-y-auto px-4 pt-2 pb-8 sm:px-8 lg:max-h-none lg:overflow-visible lg:px-8 lg:pt-8 lg:pb-10">
+                <!-- Cálculo -->
+                <section>
+                    <div class="flex items-baseline justify-between">
+                        <h2 class="label">Cálculo</h2>
+                        <span class="status-chip" data-s-status>
+                            calculando
+                        </span>
+                    </div>
+                    <div class="mt-5 grid grid-cols-2 gap-x-6 gap-y-5">
+                        <div>
+                            <div class="stat-num" data-s-digits>
+                                0
+                            </div>
+                            <div class="stat-cap">
+                                dígitos · base{' '}
+                                <span data-s-base>10</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="stat-num" data-s-elapsed>
+                                0:00
+                            </div>
+                            <div class="stat-cap">
+                                tiempo de cálculo
+                            </div>
+                        </div>
+                        <div class="col-span-2 flex items-end gap-5">
+                            <div class="shrink-0">
+                                <div class="stat-num">
+                                    <span data-s-rate>—</span>
+                                    <span class="stat-unit">/s</span>
+                                </div>
+                                <div class="stat-cap">velocidad</div>
+                            </div>
+                            <svg
+                                viewBox="0 0 100 30"
+                                preserveAspectRatio="none"
+                                class="mb-1 h-9 min-w-0 flex-1 overflow-visible"
+                                aria-hidden="true"
+                            >
+                                <line
+                                    x1="0"
+                                    y1="29.5"
+                                    x2="100"
+                                    y2="29.5"
+                                    class="stroke-line"
+                                    vector-effect="non-scaling-stroke"
+                                ></line>
+                                <polyline
+                                    data-s-spark
+                                    fill="none"
+                                    class="spark"
+                                    vector-effect="non-scaling-stroke"
+                                ></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="note mt-4">
+                        Cada dígito nuevo obliga a operar con enteros
+                        más grandes que el anterior, así que el ritmo
+                        baja poco a poco. Es lo esperado: π no se
+                        acaba, pero cuesta cada vez más.
+                    </p>
+                </section>
+
+                <!-- Distribución -->
+                <section>
+                    <div class="flex items-baseline justify-between">
+                        <h2 class="label">Distribución</h2>
+                        <span class="tiny" data-s-expected>
+                            esperado 10 %
+                        </span>
+                    </div>
+                    <div class="hist mt-5" data-s-hist></div>
+                    <div class="mt-2 flex justify-between">
+                        <span class="tiny">
+                            desviación respecto a lo esperado
+                        </span>
+                        <span
+                            class="tiny tabular-nums"
+                            data-s-dev-scale
+                        >
+                            ±1 %
+                        </span>
+                    </div>
+                </section>
+
+                <!-- χ² -->
+                <section>
+                    <h2 class="label">Prueba χ²</h2>
+                    <div class="mt-5 flex items-end gap-6">
+                        <div>
+                            <div class="stat-num" data-s-chi>
+                                —
+                            </div>
+                            <div class="stat-cap">χ²</div>
+                        </div>
+                        <div>
+                            <div class="stat-num text-dim" data-s-df>
+                                9
+                            </div>
+                            <div class="stat-cap">
+                                grados de libertad
+                            </div>
+                        </div>
+                        <div class="ml-auto text-right">
+                            <div class="stat-num" data-s-p>
+                                —
+                            </div>
+                            <div class="stat-cap">p-valor</div>
+                        </div>
+                    </div>
+
+                    <div class="pgauge mt-5" aria-hidden="true">
+                        <div class="pgauge-low"></div>
+                        <div
+                            class="pgauge-marker"
+                            data-s-marker
+                        ></div>
+                    </div>
+                    <div class="pgauge-scale tiny tabular-nums">
+                        <span style="left: 0">0</span>
+                        <span style="left: 5%">0,05</span>
+                        <span style="left: 50%">0,5</span>
+                        <span style="right: 0">1</span>
+                    </div>
+
+                    <p
+                        class="mt-4 text-[13px] leading-relaxed text-dim"
+                        data-s-verdict
+                    >
+                        Esperando dígitos…
+                    </p>
+                    <details class="explain mt-3">
+                        <summary>¿Qué significa?</summary>
+                        <p>
+                            Si π fuera un dado perfecto, cada símbolo
+                            saldría con la misma frecuencia. El χ²
+                            suma, para cada símbolo, cuánto se aleja
+                            lo observado de lo esperado (al cuadrado y
+                            en proporción). El p-valor es la
+                            probabilidad de ver un desequilibrio igual
+                            o mayor por puro azar: valores muy bajos
+                            (menos de 0,05) serían sospechosos;
+                            cualquier otro es lo normal.
+                        </p>
+                    </details>
+                </section>
+
+                <!-- Rachas -->
+                <section>
+                    <h2 class="label">Rachas</h2>
+                    <div class="mt-5">
+                        <div
+                            class="font-mono text-[1.65rem] leading-none font-light tracking-[0.18em] text-gold"
+                            data-s-run-glyphs
+                        >
+                            —
+                        </div>
+                        <div class="stat-cap mt-2.5" data-s-run-meta>
+                            la racha más larga aparecerá aquí
+                        </div>
+                    </div>
+                    <div class="mt-5 flex items-baseline justify-between border-t border-line pt-4">
+                        <span class="stat-cap">racha actual</span>
+                        <span
+                            class="font-mono text-sm text-dim tabular-nums"
+                            data-s-run-current
+                        >
+                            —
+                        </span>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</aside>

@@ -1,9 +1,57 @@
 ---
+import Header from '@/components/Header.astro';
+import StatsPanel from '@/components/StatsPanel.astro';
+import Toast from '@/components/Toast.astro';
 import Layout from '@/layouts/Layout.astro';
 ---
 
 <Layout>
-    <h1 class="text-2xl font-bold text-center py-20">
-        Hello World!!
-    </h1>
+    <div class="grid h-dvh grid-cols-[minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)] lg:grid-rows-[auto_minmax(0,1fr)]">
+        <Header />
+
+        <main class="stage relative min-h-0">
+            <section
+                class="mode-view absolute inset-0"
+                data-mode-view="digits"
+                aria-label="Decimales de π en base 10"
+            >
+                <div class="h-full" data-viewer tabindex="0"></div>
+                <button
+                    type="button"
+                    class="follow-btn"
+                    data-follow
+                    data-visible="false"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        class="size-3.5"
+                    >
+                        <path
+                            d="M12 5v14m0 0-6-6m6 6 6-6"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        ></path>
+                    </svg>
+                    Seguir al último
+                </button>
+            </section>
+            <noscript>
+                <p class="p-10 text-dim">
+                    π se calcula en tu navegador: hace falta
+                    JavaScript.
+                </p>
+            </noscript>
+        </main>
+
+        <StatsPanel />
+    </div>
+    <Toast />
 </Layout>
+
+<script>
+    import '@/scripts/app';
+</script>
