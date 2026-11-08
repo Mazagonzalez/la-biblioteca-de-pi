@@ -10,11 +10,14 @@ import SpeedInsights from '@vercel/speed-insights/astro';
 interface Props {
     title?: string;
     description?: string;
+    /** Páginas que no deben salir en buscadores (p. ej. la 404). */
+    noindex?: boolean;
 }
 
 const {
     title = 'La Biblioteca de π · Todo está aquí, en algún lugar',
     description = 'π calculado sin fin en tu navegador. Como la biblioteca de Borges, quizá contenga todo: búscate en sus dígitos y mira su aleatoriedad crecer.',
+    noindex = false,
 } = Astro.props;
 
 // Analíticas solo en el despliegue de producción de Vercel: ni en local
@@ -41,7 +44,11 @@ const ogImageAlt =
         <meta name="theme-color" content="#09090b" />
         <title>{title}</title>
         <meta name="description" content={description} />
-        <link rel="canonical" href={canonical} />
+        {noindex ? (
+            <meta name="robots" content="noindex" />
+        ) : (
+            <link rel="canonical" href={canonical} />
+        )}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
         <meta property="og:type" content="website" />

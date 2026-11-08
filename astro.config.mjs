@@ -10,5 +10,9 @@ export default defineConfig({
     vite: {
         plugins: [tailwindcss()],
         worker: { format: 'es' },
+        // Nada en línea: los scripts pequeños (p. ej. Vercel Analytics) van
+        // en archivos aparte para que la CSP de vercel.json pueda usar
+        // `script-src 'self'` sin 'unsafe-inline'.
+        build: { assetsInlineLimit: 0 },
     },
 });
