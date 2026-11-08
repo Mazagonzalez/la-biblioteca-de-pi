@@ -1,0 +1,82 @@
+---
+import { MAX_QUERY } from '@/lib/search';
+---
+
+<button
+    type="button"
+    class="icon-btn lg:hidden"
+    data-search-open
+    aria-label="Buscar en π"
+    aria-controls="search-form"
+    aria-expanded="false"
+>
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="size-[18px]">
+        <circle
+            cx="11"
+            cy="11"
+            r="6.25"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+        ></circle>
+        <path
+            d="m20 20-4.5-4.5"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+        ></path>
+    </svg>
+</button>
+
+<form
+    class="search"
+    id="search-form"
+    data-search
+    role="search"
+    data-open="false"
+>
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="search-icon">
+        <circle
+            cx="11"
+            cy="11"
+            r="6.25"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+        ></circle>
+        <path
+            d="m20 20-4.5-4.5"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+        ></path>
+    </svg>
+    <input
+        type="search"
+        name="q"
+        maxlength={MAX_QUERY + 8}
+        autocomplete="off"
+        spellcheck="false"
+        enterkeyhint="search"
+        placeholder="Una fecha o un nombre"
+        aria-label="Buscar una secuencia en π: cifras en base 10 o letras en base 26"
+    />
+    <kbd class="search-kbd" aria-hidden="true">
+        /
+    </kbd>
+    <button
+        type="button"
+        class="search-close lg:hidden"
+        data-search-close
+        aria-label="Cerrar la búsqueda"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true" class="size-4">
+            <path
+                d="M6 6l12 12M18 6 6 18"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+            ></path>
+        </svg>
+    </button>
+</form>

@@ -1,0 +1,101 @@
+---
+import { MODES } from '@/lib/modes';
+import SearchBar from './SearchBar.astro';
+---
+
+<header class="relative col-span-full flex flex-wrap items-center gap-x-10 gap-y-3 border-b border-line px-4 pt-4 pb-0 sm:px-8 lg:flex-nowrap lg:px-10 lg:py-0">
+    <a
+        href="#digitos"
+        class="group flex items-baseline gap-2.5 lg:py-5"
+        aria-label="π infinito, inicio"
+        data-home
+    >
+        <span class="font-display text-[2.6rem] leading-[0.7] text-gold italic transition-transform duration-500 group-hover:-rotate-6">
+            π
+        </span>
+        <span class="font-display text-[1.6rem] leading-none tracking-tight text-fg">
+            infinito
+        </span>
+    </a>
+
+    <nav
+        aria-label="Modos de visualización"
+        class="order-last -mx-4 w-[calc(100%+2rem)] sm:-mx-8 sm:w-[calc(100%+4rem)] lg:order-none lg:mx-0 lg:w-auto lg:self-stretch"
+    >
+        <ul class="no-scrollbar flex h-full gap-6 overflow-x-auto px-4 sm:px-8 lg:gap-7 lg:px-0 xl:gap-8">
+            {MODES.map((mode, i) => (
+                <li class="flex">
+                    <a
+                        href={`#${mode.hash}`}
+                        class="mode-tab"
+                        data-mode={mode.id}
+                        aria-current={i === 0 ? 'page' : undefined}
+                        title={`${mode.description} · base ${mode.base}`}
+                    >
+                        <span class="mode-tab-index">
+                            {String(i + 1).padStart(2, '0')}
+                        </span>
+                        {mode.label}
+                    </a>
+                </li>
+            ))}
+        </ul>
+    </nav>
+
+    <div class="ml-auto flex items-center gap-3 sm:gap-5">
+        <SearchBar />
+        <div
+            class="text-right leading-tight lg:max-xl:hidden"
+            aria-live="off"
+        >
+            <div class="font-mono text-sm text-fg tabular-nums">
+                <span data-h-count>0</span>
+                <span class="text-mute" data-h-unit>
+                    díg.
+                </span>
+            </div>
+            <div
+                class="font-mono text-[11px] text-mute tabular-nums"
+                data-h-rate
+            >
+                —
+            </div>
+        </div>
+        <button
+            type="button"
+            class="play-toggle"
+            data-toggle
+            aria-pressed="false"
+            aria-label="Pausar el cálculo"
+            title="Pausar (espacio)"
+        >
+            <svg
+                viewBox="0 0 24 24"
+                class="icon-pause"
+                aria-hidden="true"
+            >
+                <rect
+                    x="7"
+                    y="5.5"
+                    width="3"
+                    height="13"
+                    rx="1"
+                ></rect>
+                <rect
+                    x="14"
+                    y="5.5"
+                    width="3"
+                    height="13"
+                    rx="1"
+                ></rect>
+            </svg>
+            <svg
+                viewBox="0 0 24 24"
+                class="icon-play"
+                aria-hidden="true"
+            >
+                <path d="M8.5 5.8v12.4a.8.8 0 0 0 1.2.7l9.8-6.2a.8.8 0 0 0 0-1.4L9.7 5.1a.8.8 0 0 0-1.2.7Z"></path>
+            </svg>
+        </button>
+    </div>
+</header>

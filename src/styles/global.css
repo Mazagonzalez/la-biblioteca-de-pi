@@ -3,7 +3,57 @@
 @import './components.css';
 @import './scrollbar.css';
 @import './animations.css';
+@import './app.css' layer(components);
+@import './modes.css' layer(components);
 
 @theme {
-    --color-scrollbar: #a3a3a3;
+    --font-sans:
+        'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+    --font-mono:
+        'Geist Mono Variable', ui-monospace, 'SF Mono', Menlo,
+        monospace;
+    --font-display: 'Instrument Serif', ui-serif, Georgia, serif;
+
+    /* Negros cálidos, casi tinta. */
+    --color-void: #09090b;
+    --color-ink: #0e0e10;
+    --color-raise: #151517;
+    --color-line: rgb(255 255 255 / 0.065);
+    --color-line-strong: rgb(255 255 255 / 0.12);
+
+    /* Texto: blanco hueso y grises con un punto de calidez. */
+    --color-fg: #ede8df;
+    --color-digit: #c9c3b8;
+    --color-dim: #a29c92;
+    --color-mute: #6f6a63;
+    --color-faint: #3d3a36;
+
+    /* Un único acento: oro viejo. */
+    --color-gold: #d8b06a;
+    --color-gold-soft: rgb(216 176 106 / 0.14);
+    --color-rose: #c2736a;
+
+    --color-scrollbar: #2b2926;
+}
+
+@layer base {
+    html {
+        color-scheme: dark;
+        -webkit-tap-highlight-color: transparent;
+        text-rendering: optimizeLegibility;
+    }
+
+    ::selection {
+        background: rgb(216 176 106 / 0.28);
+        color: var(--color-fg);
+    }
+
+    :focus-visible {
+        outline: 1px solid var(--color-gold);
+        outline-offset: 3px;
+    }
+
+    button:not(:disabled) {
+        cursor: pointer;
+    }
 }

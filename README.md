@@ -1,27 +1,51 @@
-# la-biblioteca-de-pi
+# π infinito
 
-Proyecto creado con [create-amg-astro](https://www.npmjs.com/package/create-amg-astro): Astro + React + Tailwind + ESLint + Prettier.
+Una página que calcula π sin detenerse, en el navegador, y deja ver su
+aleatoriedad mientras crece. Astro + TypeScript (strict) + Tailwind, sin
+frameworks de UI. Todo corre en el cliente; se despliega como sitio estático.
 
-## Estructura
+## Cómo funciona
 
-```text
-/
-├── public/             favicon.svg, favicon.ico
-├── src/
-│   ├── layouts/        Layout.astro
-│   ├── pages/          index.astro
-│   └── styles/         global.css, components.css, scrollbar.css, animations.css
-├── astro.config.mjs
-└── package.json
-```
+- **Spigot de Gibbons con BigInt**, genérico en cualquier base
+  (`src/lib/spigot.ts`). Para no pagar una división BigInt en cada paso, la
+  prueba «¿es seguro el dígito?» se hace con los ~60 bits altos del estado y
+  solo se recurre a la división exacta en los casos límite; además, los
+  términos de la serie se componen de varios en varios. El resultado es
+  idéntico al algoritmo de referencia y unas 20 veces más rápido.
+- **Web Worker** (`src/workers/pi.worker.ts`): un flujo por base; solo avanza
+  el de la base activa. Envía lotes cada ~40 ms como `Uint8Array`
+  transferible.
+- **Almacén** en trozos de `Uint8Array` crecientes (`src/lib/store.ts`).
+- **Estadísticas incrementales** (`src/lib/stats.ts`): histograma, χ² con
+  p-valor (gamma incompleta regularizada) y rachas.
+- **Renderers** en `src/lib/renderers/` (texto, píxeles, caminata) y audio en
+  `src/lib/audio.ts`.
+- **Visor virtualizado** (`src/lib/renderers/text-viewer.ts`): solo pinta las
+  filas visibles, con «seguir al último».
+
+## Modos
+
+| Modo     | Base | Qué muestra                                                                  |
+| -------- | ---- | ---------------------------------------------------------------------------- |
+| Dígitos  | 10   | Texto en bloques de 10, virtualizado, con «seguir al último»                 |
+| Letras   | 26   | Lo mismo con A = 0 … Z = 25                                                  |
+| Color    | 10   | Un píxel por dígito (ImageData), paleta apta para daltonismo, zoom 1–16 px   |
+| Caminata | 4    | 0↑ 1→ 2↓ 3←, degradado por posición, encuadre automático, zoom y paneo       |
+| Sonido   | 10   | Escala pentatónica con Web Audio, volumen y tempo independientes del cálculo |
+
+## Buscador
+
+Cifras → base 10 (p. ej. una fecha); letras → base 26 (p. ej. un nombre).
+Usa Knuth–Morris–Pratt con estado entre lotes (`src/lib/search.ts`), así que
+no pierde coincidencias que cruzan el borde entre dos lotes, y revisa lo ya
+calculado en porciones de ~6 ms para no bloquear el hilo principal. Atajo: `/`.
 
 ## Comandos
 
-| Comando             | Acción                                        |
-| ------------------- | --------------------------------------------- |
-| `pnpm dev`          | Servidor de desarrollo en `localhost:4321`    |
-| `pnpm build`        | Genera el sitio de producción en `./dist/`    |
-| `pnpm preview`      | Sirve el build localmente antes de publicarlo |
-| `pnpm lint`         | Revisa el código con ESLint                   |
-| `pnpm format`       | Formatea el código con Prettier               |
-| `pnpm format:check` | Comprueba el formato sin modificar archivos   |
+| Comando       | Acción                                     |
+| ------------- | ------------------------------------------ |
+| `pnpm dev`    | Servidor de desarrollo en `localhost:4321` |
+| `pnpm build`  | Genera el sitio estático en `./dist/`      |
+| `pnpm test`   | Tests (Vitest)                             |
+| `pnpm lint`   | ESLint                                     |
+| `pnpm format` | Prettier                                   |

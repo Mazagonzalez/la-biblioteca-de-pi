@@ -1,5 +1,8 @@
 ---
-import { ClientRouter } from 'astro:transitions';
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
+import '@fontsource/instrument-serif/latin-400.css';
+import '@fontsource/instrument-serif/latin-400-italic.css';
 import '../styles/global.css';
 
 interface Props {
@@ -7,45 +10,27 @@ interface Props {
     description?: string;
 }
 
-const siteName = 'la-biblioteca-de-pi';
-
-const { title = siteName, description = `Sitio web de ${siteName}` } =
-    Astro.props;
+const {
+    title = 'π infinito',
+    description = 'π calculado sin fin, dígito a dígito, en tu navegador. Mira su aleatoriedad mientras crece.',
+} = Astro.props;
 ---
 
-<html lang="es">
+<html lang="es" class="h-full">
     <head>
         <meta charset="UTF-8" />
         <meta
             name="viewport"
-            content="width=device-width, initial-scale=1"
+            content="width=device-width, initial-scale=1, viewport-fit=cover"
         />
         <meta name="generator" content={Astro.generator} />
+        <meta name="color-scheme" content="dark" />
+        <meta name="theme-color" content="#09090b" />
         <title>{title}</title>
         <meta name="description" content={description} />
-
-        <ClientRouter transition:persist />
-
-        <!-- Favicon -->
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     </head>
-    <body class="scrollbar">
-        <main>
-            <slot />
-        </main>
+    <body class="h-full overflow-hidden bg-void font-sans text-fg antialiased">
+        <slot />
     </body>
 </html>
-
-<style is:global>
-    html {
-        background-color: white;
-        color: black;
-        scroll-behavior: smooth;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        html {
-            scroll-behavior: auto;
-        }
-    }
-</style>
