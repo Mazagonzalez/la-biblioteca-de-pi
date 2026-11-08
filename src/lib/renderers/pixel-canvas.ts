@@ -32,7 +32,7 @@ export class PixelCanvas {
     private readonly spacer: HTMLDivElement;
     private readonly canvas: HTMLCanvasElement;
     private readonly ctx: CanvasRenderingContext2D;
-    private readonly lut = paletteLut(DIGIT_PALETTE);
+    private lut = paletteLut(DIGIT_PALETTE);
     private readonly resizeObserver: ResizeObserver;
     private readonly callbacks: PixelCanvasCallbacks;
     private stream: PiStream | null = null;
@@ -99,6 +99,12 @@ export class PixelCanvas {
             this.layout();
             this.scrollToIndex(anchor);
         }
+        this.invalidate();
+    }
+
+    /** Cambia los colores de los dígitos (10 colores, uno por dígito). */
+    setPalette(colors: readonly string[]): void {
+        this.lut = paletteLut(colors);
         this.invalidate();
     }
 

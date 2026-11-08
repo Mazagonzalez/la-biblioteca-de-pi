@@ -17,6 +17,18 @@ export const DIGIT_PALETTE = [
     '#dddddd', // 9 gris claro
 ] as const;
 
+/**
+ * Blanco y negro: un bit por decimal. 0–4 es negro y 5–9 blanco, así cada
+ * píxel es una moneda al aire (si π es normal, mitad y mitad). Con figuras
+ * pequeñas de pocos píxeles pasa como con las palabras: tarde o temprano
+ * aparecen.
+ */
+export const BW_DARK = '#09090b';
+export const BW_LIGHT = '#ede8df';
+export const BW_PALETTE = Array.from({ length: 10 }, (_, d) =>
+    d < 5 ? BW_DARK : BW_LIGHT,
+);
+
 /** La paleta como enteros RGBA listos para un Uint32Array de ImageData. */
 export function paletteLut(colors: readonly string[]): Uint32Array {
     const lut = new Uint32Array(colors.length);

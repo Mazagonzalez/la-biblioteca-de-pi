@@ -1,5 +1,5 @@
 ---
-import { DIGIT_PALETTE } from '@/lib/palette';
+import { BW_DARK, BW_LIGHT, DIGIT_PALETTE } from '@/lib/palette';
 import FollowButton from './FollowButton.astro';
 import ZoomControls from './ZoomControls.astro';
 ---
@@ -33,6 +33,7 @@ import ZoomControls from './ZoomControls.astro';
     data-mode-view="color"
     data-active="false"
     aria-label="Cada decimal de π como un píxel de color"
+    data-style="color"
 >
     <div class="h-full" data-pixels></div>
     <div
@@ -42,17 +43,56 @@ import ZoomControls from './ZoomControls.astro';
         aria-hidden="true"
     ></div>
     <div class="mode-dock">
-        <ul class="legend" aria-label="Paleta: un color por dígito">
-            {DIGIT_PALETTE.map((color, digit) => (
+        <div class="dock-group">
+            <div
+                class="seg"
+                role="group"
+                aria-label="Estilo"
+                data-color-style
+            >
+                <button type="button" data-value="color">
+                    Color
+                </button>
+                <button type="button" data-value="bw">
+                    Blanco y negro
+                </button>
+            </div>
+            <ul
+                class="legend"
+                aria-label="Paleta: un color por dígito"
+                data-for="color"
+            >
+                {DIGIT_PALETTE.map((color, digit) => (
+                    <li>
+                        <span
+                            class="legend-swatch"
+                            style={`background:${color}`}
+                        />
+                        {digit}
+                    </li>
+                ))}
+            </ul>
+            <ul
+                class="legend"
+                aria-label="Paleta: 0 a 4 en negro, 5 a 9 en blanco"
+                data-for="bw"
+            >
                 <li>
                     <span
                         class="legend-swatch"
-                        style={`background:${color}`}
+                        style={`background:${BW_DARK}`}
                     />
-                    {digit}
+                    0–4
                 </li>
-            ))}
-        </ul>
+                <li>
+                    <span
+                        class="legend-swatch"
+                        style={`background:${BW_LIGHT}`}
+                    />
+                    5–9
+                </li>
+            </ul>
+        </div>
         <ZoomControls label="4 px" />
     </div>
     <FollowButton />
