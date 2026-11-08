@@ -16,6 +16,16 @@ const compact = new Intl.NumberFormat('es', {
     maximumFractionDigits: 1,
 });
 
+const SUPERSCRIPT = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+
+/** ~b^k legible: «457 mil», «309 M» o, si es enorme, «10²⁰». */
+function fmtExpected(base: number, length: number): string {
+    const value = base ** length;
+    if (value < 1e9) return compact.format(value);
+    const exp = String(length).replace(/\d/g, (d) => SUPERSCRIPT[+d]);
+    return `${base}${exp}`;
+}
+
 export interface SearchHooks {
     /** La búsqueda empieza: hay que mostrar el modo de texto de esa base. */
     onStart(base: 10 | 26): void;
@@ -167,8 +177,8 @@ export class SearchController {
                   : '';
         const hint =
             expected > 2e7
-                ? ` · suele aparecer hacia la posición ~${compact.format(expected)}: puede tardar muchísimo`
-                : ` · suele aparecer hacia la ~${compact.format(expected)}`;
+                ? ` · suele aparecer hacia la posición ~${fmtExpected(q.base, q.symbols.length)}: puede tardar muchísimo`
+                : ` · suele aparecer hacia la ~${fmtExpected(q.base, q.symbols.length)}`;
         this.show(
             'searching',
             `Buscando ${label} · ${fmtInt(s.scanned)} revisadas${hint}${paused}`,

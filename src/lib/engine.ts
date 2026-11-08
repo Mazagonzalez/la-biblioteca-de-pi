@@ -12,6 +12,13 @@ export class SpeedMeter {
     /** Una muestra de velocidad por segundo de cálculo (máx. 120). */
     readonly history: number[] = [];
 
+    /** Empieza a medir desde aquí (p. ej. tras retomar lo guardado). */
+    reset(computeMs: number, count: number): void {
+        this.samples = [{ ms: computeMs, count }];
+        this.lastHistoryMs = computeMs;
+        this.rate = 0;
+    }
+
     add(computeMs: number, count: number): void {
         const samples = this.samples;
         samples.push({ ms: computeMs, count });
@@ -54,6 +61,7 @@ export class PiStream {
 type BatchListener = (stream: PiStream, added: number) => void;
 type RecordListener = (stream: PiStream, record: RunRecord) => void;
 type StateListener = (engine: PiEngine) => void;
+type RestoreListener = (stream: PiStream) => void;
 
 /**
  * Cliente del worker: guarda los dígitos que llegan por base, actualiza
@@ -65,8 +73,11 @@ export class PiEngine {
     private readonly batchListeners = new Set<BatchListener>();
     private readonly recordListeners = new Set<RecordListener>();
     private readonly stateListeners = new Set<StateListener>();
+    private readonly restoreListeners = new Set<RestoreListener>();
     activeBase: number;
     paused = false;
+    /** null mientras no se sabe; luego, si IndexedDB funciona aquí. */
+    storage: boolean | null = null;
 
     constructor(base: number) {
         this.activeBase = base;
@@ -77,6 +88,23 @@ export class PiEngine {
         this.worker.onmessage = (event: MessageEvent<FromWorker>) =>
             this.receive(event.data);
         this.send({ type: 'setBase', base });
+
+        // Guarda el progreso al ocultar o cerrar la página.
+        const flush = () => this.send({ type: 'flush' });
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') flush();
+        });
+        window.addEventListener('pagehide', flush);
+    }
+
+    /** Borra lo guardado en este navegador y recarga la página. */
+    reset(): void {
+        this.send({ type: 'reset' });
+    }
+
+    onRestore(fn: RestoreListener): () => void {
+        this.restoreListeners.add(fn);
+        return () => this.restoreListeners.delete(fn);
     }
 
     stream(base: number): PiStream {
@@ -142,7 +170,15 @@ export class PiEngine {
     }
 
     private receive(msg: FromWorker): void {
-        if (msg.type !== 'batch') return;
+        if (msg.type === 'reset-done') {
+            location.reload();
+            return;
+        }
+        if (msg.type === 'storage') {
+            this.storage = msg.available;
+            this.emitState();
+            return;
+        }
         const stream = this.stream(msg.base);
         // Los lotes llegan en orden; si no encaja, se descarta.
         if (msg.start !== stream.length) return;
@@ -150,10 +186,16 @@ export class PiEngine {
         stream.computeMs = msg.computeMs;
         stream.store.append(msg.digits);
         const record = stream.stats.push(msg.digits, msg.start);
-        stream.speed.add(msg.computeMs, stream.length);
+        if (msg.restored) {
+            stream.speed.reset(msg.computeMs, stream.length);
+        } else {
+            stream.speed.add(msg.computeMs, stream.length);
+        }
         for (const fn of this.batchListeners)
             fn(stream, msg.digits.length);
-        if (record) {
+        if (msg.restored) {
+            for (const fn of this.restoreListeners) fn(stream);
+        } else if (record) {
             for (const fn of this.recordListeners) fn(stream, record);
         }
     }

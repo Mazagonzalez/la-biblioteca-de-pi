@@ -25,6 +25,22 @@
  *    pequeña antes de aplicarlos al estado grande (la composición de
  *    transformaciones es asociativa, así que el estado es el mismo).
  */
+/** Estado serializable del spigot (BigInt como texto hexadecimal). */
+export interface SpigotSnapshot {
+    base: number;
+    q: string;
+    r: string;
+    t: string;
+    k: number;
+    log2t: number;
+}
+
+const toHex = (n: bigint): string =>
+    n < 0n ? `-${(-n).toString(16)}` : n.toString(16);
+
+const fromHex = (s: string): bigint =>
+    s.startsWith('-') ? -BigInt(`0x${s.slice(1)}`) : BigInt(`0x${s}`);
+
 export class PiSpigot {
     readonly base: number;
     private readonly b: bigint;
@@ -46,6 +62,29 @@ export class PiSpigot {
         this.b = BigInt(base);
         // Cada término aporta ~1 bit; un dígito en base b necesita ~log₂ b.
         this.group = Math.max(1, Math.ceil(Math.log2(base)));
+    }
+
+    /** Copia del estado para guardarla y retomar el cálculo más tarde. */
+    snapshot(): SpigotSnapshot {
+        return {
+            base: this.base,
+            q: toHex(this.q),
+            r: toHex(this.r),
+            t: toHex(this.t),
+            k: this.k,
+            log2t: this.log2t,
+        };
+    }
+
+    /** Spigot que continúa exactamente donde se tomó el snapshot. */
+    static restore(snap: SpigotSnapshot): PiSpigot {
+        const spigot = new PiSpigot(snap.base);
+        spigot.q = fromHex(snap.q);
+        spigot.r = fromHex(snap.r);
+        spigot.t = fromHex(snap.t);
+        spigot.k = snap.k;
+        spigot.log2t = snap.log2t;
+        return spigot;
     }
 
     /** Siguiente valor del flujo (el primero es la parte entera). */
