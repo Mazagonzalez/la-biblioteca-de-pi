@@ -1,11 +1,13 @@
 import type { PiStream } from '../engine';
-import { fmtInt } from '../format';
+import { fmtInt, numberWord } from '../format';
 import type { ModeView } from '../modes';
 import { MandalaCanvas } from '../renderers/mandala-canvas';
+import { SkyCanvas } from '../renderers/sky-canvas';
 import { ThreadsCanvas } from '../renderers/threads-canvas';
 import { $ } from './dom';
 
-type Style = 'threads' | 'mandala';
+type Style = 'threads' | 'mandala' | 'sky';
+const STYLES: readonly Style[] = ['threads', 'mandala', 'sky'];
 
 const STORE_KEY = 'pi-infinito:dibujo';
 
@@ -13,13 +15,23 @@ interface Prefs {
     style: Style;
     window: number;
     symmetry: number;
+    skyWindow: number;
 }
 
 const DEFAULTS: Prefs = {
     style: 'threads',
     window: 5000,
     symmetry: 6,
+    skyWindow: 100,
 };
+
+function pick<T>(
+    value: unknown,
+    allowed: readonly T[],
+    fallback: T,
+): T {
+    return allowed.includes(value as T) ? (value as T) : fallback;
+}
 
 function loadPrefs(): Prefs {
     try {
@@ -27,13 +39,18 @@ function loadPrefs(): Prefs {
         if (!raw) return { ...DEFAULTS };
         const p = JSON.parse(raw) as Partial<Prefs>;
         return {
-            style: p.style === 'mandala' ? 'mandala' : 'threads',
-            window: [1000, 5000, 20000].includes(p.window ?? 0)
-                ? (p.window as number)
-                : DEFAULTS.window,
-            symmetry: [6, 8, 12].includes(p.symmetry ?? 0)
-                ? (p.symmetry as number)
-                : DEFAULTS.symmetry,
+            style: pick(p.style, STYLES, DEFAULTS.style),
+            window: pick(
+                p.window,
+                [1000, 5000, 20000],
+                DEFAULTS.window,
+            ),
+            symmetry: pick(p.symmetry, [6, 8, 12], DEFAULTS.symmetry),
+            skyWindow: pick(
+                p.skyWindow,
+                [25, 100, 400],
+                DEFAULTS.skyWindow,
+            ),
         };
     } catch {
         return { ...DEFAULTS };
@@ -48,19 +65,23 @@ function savePrefs(prefs: Prefs): void {
     }
 }
 
+/** Lo que cada lienzo de dibujo sabe hacer. */
+interface Drawing {
+    avoid: HTMLElement[];
+    setStream(stream: PiStream): void;
+    pause(): void;
+    invalidate(): void;
+}
+
 /** Modo Dibujo: los dígitos de π como instrucciones para dibujar. */
 export class DrawModeView implements ModeView {
     private readonly section: HTMLElement;
     private readonly threads: ThreadsCanvas;
     private readonly mandala: MandalaCanvas;
+    private readonly sky: SkyCanvas;
+    private readonly drawings: Record<Style, Drawing>;
     private readonly prefs = loadPrefs();
     private stream: PiStream | null = null;
-    private readonly el: {
-        tShown: HTMLElement;
-        tPair: HTMLElement;
-        mSteps: HTMLElement;
-        mCopies: HTMLElement;
-    };
 
     constructor(section: HTMLElement) {
         this.section = section;
@@ -70,50 +91,70 @@ export class DrawModeView implements ModeView {
         this.mandala = new MandalaCanvas(
             $(section, '[data-mandala]'),
         );
-        this.el = {
-            tShown: $(section, '[data-t-shown]'),
-            tPair: $(section, '[data-t-pair]'),
-            mSteps: $(section, '[data-m-steps]'),
-            mCopies: $(section, '[data-m-copies]'),
+        this.sky = new SkyCanvas($(section, '[data-sky]'));
+        this.drawings = {
+            threads: this.threads,
+            mandala: this.mandala,
+            sky: this.sky,
         };
 
-        const floating = (style: Style): HTMLElement[] => [
-            $(section, `.draw-info[data-for="${style}"]`),
-            ...section.querySelectorAll<HTMLElement>(
-                '.mode-dock .seg',
-            ),
-        ];
-        this.threads.avoid = floating('threads');
-        this.mandala.avoid = floating('mandala');
+        for (const style of STYLES) {
+            this.drawings[style].avoid = [
+                $(section, `.draw-info[data-for="${style}"]`),
+                ...section.querySelectorAll<HTMLElement>(
+                    '.mode-dock .seg',
+                ),
+            ];
+        }
+
+        const text = (selector: string) => $(section, selector);
+        const tShown = text('[data-t-shown]');
+        const tPair = text('[data-t-pair]');
+        const mSteps = text('[data-m-steps]');
+        const mCopies = text('[data-m-copies]');
+        const sGroups = text('[data-k-groups]');
+        const sStars = text('[data-k-stars]');
+        const sLast = text('[data-k-last]');
 
         this.threads.onInfo = (info) => {
-            this.el.tShown.textContent = fmtInt(info.shown);
-            this.el.tPair.textContent =
+            tShown.textContent = fmtInt(info.shown);
+            tPair.textContent =
                 info.from === null
                     ? '—'
                     : `${info.from} → ${info.to}`;
         };
         this.mandala.onInfo = (info) => {
-            this.el.mSteps.textContent = fmtInt(info.steps);
-            this.el.mCopies.textContent = String(info.symmetry * 2);
+            mSteps.textContent = fmtInt(info.steps);
+            mCopies.textContent = String(info.symmetry * 2);
+        };
+        this.sky.onInfo = (info) => {
+            sGroups.textContent = fmtInt(info.groups);
+            sStars.textContent = fmtInt(info.stars);
+            sLast.textContent =
+                info.lastSize === null
+                    ? '—'
+                    : `${numberWord(info.lastSize)} estrellas`;
         };
 
         this.bindGroup('[data-draw-style]', (value) =>
-            this.setStyle(value as Style),
+            this.setStyle(pick(value, STYLES, this.prefs.style)),
         );
         this.bindGroup('[data-draw-window]', (value) => {
             this.prefs.window = Number(value);
             this.threads.setWindow(this.prefs.window);
-            savePrefs(this.prefs);
         });
         this.bindGroup('[data-draw-symmetry]', (value) => {
             this.prefs.symmetry = Number(value);
             this.mandala.setSymmetry(this.prefs.symmetry);
-            savePrefs(this.prefs);
+        });
+        this.bindGroup('[data-draw-sky]', (value) => {
+            this.prefs.skyWindow = Number(value);
+            this.sky.setWindow(this.prefs.skyWindow);
         });
 
         this.threads.setWindow(this.prefs.window);
         this.mandala.setSymmetry(this.prefs.symmetry);
+        this.sky.setWindow(this.prefs.skyWindow);
         this.syncButtons();
         this.section.dataset.style = this.prefs.style;
     }
@@ -130,6 +171,7 @@ export class DrawModeView implements ModeView {
             ).closest<HTMLButtonElement>('button[data-value]');
             if (!btn?.dataset.value) return;
             onPick(btn.dataset.value);
+            savePrefs(this.prefs);
             this.syncButtons();
         });
     }
@@ -139,6 +181,7 @@ export class DrawModeView implements ModeView {
             '[data-draw-style]': this.prefs.style,
             '[data-draw-window]': String(this.prefs.window),
             '[data-draw-symmetry]': String(this.prefs.symmetry),
+            '[data-draw-sky]': String(this.prefs.skyWindow),
         };
         for (const [selector, value] of Object.entries(current)) {
             for (const btn of $(
@@ -158,19 +201,16 @@ export class DrawModeView implements ModeView {
     private setStyle(style: Style): void {
         if (style === this.prefs.style) return;
         this.prefs.style = style;
-        savePrefs(this.prefs);
         this.section.dataset.style = style;
         if (this.stream) this.start(this.stream);
     }
 
     private start(stream: PiStream): void {
-        if (this.prefs.style === 'threads') {
-            this.mandala.pause();
-            this.threads.setStream(stream);
-        } else {
-            this.threads.pause();
-            this.mandala.setStream(stream);
+        for (const style of STYLES) {
+            if (style !== this.prefs.style)
+                this.drawings[style].pause();
         }
+        this.drawings[this.prefs.style].setStream(stream);
     }
 
     activate(stream: PiStream): void {
@@ -179,12 +219,10 @@ export class DrawModeView implements ModeView {
     }
 
     deactivate(): void {
-        this.threads.pause();
-        this.mandala.pause();
+        for (const style of STYLES) this.drawings[style].pause();
     }
 
     update(): void {
-        if (this.prefs.style === 'threads') this.threads.invalidate();
-        else this.mandala.invalidate();
+        this.drawings[this.prefs.style].invalidate();
     }
 }

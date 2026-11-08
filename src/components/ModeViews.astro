@@ -205,6 +205,7 @@ import ZoomControls from './ZoomControls.astro';
 >
     <div class="draw-stage" data-threads data-for="threads"></div>
     <div class="draw-stage" data-mandala data-for="mandala"></div>
+    <div class="draw-stage" data-sky data-for="sky"></div>
 
     <div class="draw-info" data-for="threads">
         <p class="draw-title">Hilos</p>
@@ -244,6 +245,30 @@ import ZoomControls from './ZoomControls.astro';
         </p>
     </div>
 
+    <div class="draw-info" data-for="sky">
+        <p class="draw-title">Constelaciones</p>
+        <dl class="walk-stats">
+            <div>
+                <dt>constelaciones</dt>
+                <dd data-k-groups>0</dd>
+            </div>
+            <div>
+                <dt>estrellas</dt>
+                <dd data-k-stars>0</dd>
+            </div>
+            <div>
+                <dt>la última</dt>
+                <dd data-k-last>—</dd>
+            </div>
+        </dl>
+        <p class="walk-note">
+            Cada grupo de decimales es una constelación: los dígitos
+            dicen cuántas estrellas tiene, dónde está y cuánto brilla
+            cada una. Las líneas unen cada estrella con su vecina más
+            cercana.
+        </p>
+    </div>
+
     <div class="mode-dock">
         <div
             class="seg"
@@ -256,6 +281,9 @@ import ZoomControls from './ZoomControls.astro';
             </button>
             <button type="button" data-value="mandala">
                 Mandala
+            </button>
+            <button type="button" data-value="sky">
+                Constelaciones
             </button>
         </div>
         <div
@@ -292,6 +320,24 @@ import ZoomControls from './ZoomControls.astro';
             </button>
             <button type="button" data-value="12">
                 12
+            </button>
+        </div>
+        <div
+            class="seg"
+            role="group"
+            aria-label="Constelaciones con líneas"
+            data-draw-sky
+            data-for="sky"
+        >
+            <span class="seg-label">con líneas</span>
+            <button type="button" data-value="25">
+                25
+            </button>
+            <button type="button" data-value="100">
+                100
+            </button>
+            <button type="button" data-value="400">
+                400
             </button>
         </div>
     </div>

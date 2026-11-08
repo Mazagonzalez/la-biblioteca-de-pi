@@ -778,8 +778,9 @@
 }
 
 /* Solo se ve lo del estilo activo. */
-.draw[data-style='threads'] [data-for='mandala'],
-.draw[data-style='mandala'] [data-for='threads'] {
+.draw:not([data-style='threads']) [data-for='threads'],
+.draw:not([data-style='mandala']) [data-for='mandala'],
+.draw:not([data-style='sky']) [data-for='sky'] {
     display: none;
 }
 
